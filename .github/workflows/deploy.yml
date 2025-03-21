@@ -1,0 +1,61 @@
+name: Deploy to AWS CodeDeploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # Cambia esto a tu región
+
+      - name: Zip the application
+        run: |
+          echo "Comprimiendo archivo"
+          zip -r aplicacionPresentar.zip . -x '*.git*' '*.github*' 'node_modules/*' 'vendor/*' # Excluye archivos innecesarios
+
+          # Verifica que el archivo .zip se haya creado correctamente
+          if [ ! -f aplicacionPresentar.zip ]; then
+            echo "Error: No se pudo crear el archivo aplicacionPresentar.zip"
+            exit 1
+          fi
+
+          # Verifica que el archivo .zip no esté vacío
+          if [ ! -s aplicacionPresentar.zip ]; then
+            echo "Error: El archivo aplicacionPresentar.zip está vacío"
+            exit 1
+          fi
+
+      - name: Upload to S3
+        run: |
+          # Sube el archivo .zip a S3, sobrescribiendo el existente
+          aws s3 cp aplicacionPresentar.zip s3://myawsbucket-10d/aplicacionPresentar.zip
+
+      - name: Verify S3 upload
+        run: |
+          # Verifica que el archivo en S3 no esté vacío
+          FILE_SIZE=$(aws s3api head-object --bucket myawsbucket-10d --key aplicacionPresentar.zip --query "ContentLength")
+          if [ "$FILE_SIZE" -eq 0 ]; then
+            echo "Error: El archivo aplicacionPresentar.zip en S3 está vacío"
+            exit 1
+          else
+            echo "El archivo aplicacionPresentar.zip se subió correctamente a S3 con un tamaño de $FILE_SIZE bytes"
+          fi
+
+      - name: Deploy to AWS CodeDeploy
+        run: |
+          aws deploy create-deployment \
+            --application-name aplicacionPresentarCodeDeploy \
+            --deployment-group-name appCodeDeplyoGrupo \
+            --s3-location bucket=myawsbucket-10d,key=aplicacionPresentar.zip,bundleType=zip

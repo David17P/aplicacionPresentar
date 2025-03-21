@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido Warriors 3.0</title>
+    <!-- Vincular Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilo adicional para el fondo */
+        .bg-light-custom {
+            background-color: #f7f7f7;
+        }
+        .img-custom {
+            width: 100%;
+            height: auto;
+        }
+        .logo {
+            font-weight: bold;
+            font-size: 24px;
+            color: #00B37E;
+        }
+    </style>
+</head>
+<body class="bg-light-custom">
+
+    <!-- Contenedor principal -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Columna para la imagen de la derecha -->
+            <div class="col-lg-7 d-none d-lg-block">
+                <img src="https://i.imgur.com/0ZhHarx.jpeg" alt="Imagen de Dashboard" class="img-custom">
+            </div>
+
+            <!-- Columna para el formulario de inicio de sesión -->
+            <div class="col-lg-5 d-flex align-items-center justify-content-center">
+                <div class="p-4 w-100">
+                    <!-- Logo y bienvenida -->
+                    <div class="mb-4 text-center">
+                        <span class="logo">NBA</span>
+                    </div>
+                    <h2 class="text-center mb-3">¡Bienvenido Warrior! 👋</h2>
+                    <p class="text-center mb-4">Jugadores autorizados</p>
+
+                    <!-- Formulario de inicio de sesión -->
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Usuario</label>
+                            <input type="text" class="form-control" id="username" placeholder="Usuario" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Clave</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" placeholder="********" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember">
+                            <label class="form-check-label" for="remember">Recordar</label>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="#" class="text-decoration-none">Olvidaste tu clave?</a>
+                            <button type="submit" class="btn btn-success">Iniciar sesión</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de Bootstrap y otros complementos -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Función para mostrar y ocultar la contraseña
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('password');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        });
+
+        // Redirección automática al enviar el formulario
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            window.location.href = 'tablas.html'; 
+        });
+    </script>
+</body>
+</html>

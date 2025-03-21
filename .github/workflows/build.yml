@@ -1,0 +1,45 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Wait for SonarQube analysis to complete
+        run: sleep 180  # Espera 120 segundos (2 minutos) para que el análisis se complete
+
+      - name: Check Quality Gate status
+        id: check-quality-gate
+        run: |
+          # Consulta el estado del Quality Gate usando la API de SonarCloud
+          RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=David17P_aplicacionPresentar")
+          
+          # Imprime la respuesta completa de la API para depuración
+          echo "API Response: $RESPONSE"
+          
+          STATUS=$(echo "$RESPONSE" | jq -r '.projectStatus.status')
+
+          # Muestra el estado del Quality Gate
+          echo "Quality Gate status: $STATUS"
+
+          # Falla el workflow si el Quality Gate no es OK
+          if [ "$STATUS" != "OK" ]; then
+            REASON=$(echo "$RESPONSE" | jq -r '.projectStatus.conditions[] | select(.status != "OK") | "error " + .metricKey + ": " + .actualValue + " (expected " + .errorThreshold + ")"')
+            echo "::error::$REASON"
+            exit 1
+          fi
