@@ -22,7 +22,7 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.organization=David
+            -Dsonar.organization=david17p
             -Dsonar.projectKey=David17P_aplicacionPresentar
 
       - name: Check Quality Gate status
